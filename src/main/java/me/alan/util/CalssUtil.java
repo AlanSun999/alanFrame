@@ -1,0 +1,95 @@
+package me.alan.util;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.net.JarURLConnection;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+
+/**
+ * @Description: 类操作工具类
+ * @Author: ALan
+ * @Date: 2018-04-02
+ * @Time: 15:47
+ */
+public class CalssUtil {
+
+    private static final Logger logger = LoggerFactory.getLogger(CalssUtil.class);
+
+    /**
+     * 获取类加载器
+     */
+    public static ClassLoader getClassLoader(){
+        return Thread.currentThread().getContextClassLoader();
+    }
+
+    /**
+     * 加载类
+     */
+    public static Class<?> loadClass(String className,boolean isInitialized){
+        Class<?> cls = null;
+        try {
+            cls = Class.forName(className,isInitialized,getClassLoader());
+        }catch (ClassNotFoundException e) {
+            logger.error("load class failure",e);
+            throw  new RuntimeException(e);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return cls;
+    }
+
+    /**
+     * 获取指定包名下的所有类
+     */
+    public  static Set<Class<?>> getClassSet(String packageName){
+        Set<Class<?>> classSet = new HashSet<Class<?>>();
+        try{
+            Enumeration<URL> urls = getClassLoader().getResources(packageName.replace(".","/"));
+            while (urls.hasMoreElements()){
+                URL url = urls.nextElement();
+                if(url != null){
+                    String protocol = url.getProtocol();
+                    if(protocol.equals("file")){
+                        String packagePath = url.getPath().replaceAll("%20"," ");
+                        addClass(classSet,packagePath,packageName);
+                    }else if(protocol.equals("jar")){
+                        JarURLConnection jarURLConnection = (JarURLConnection)url.openConnection();
+                        if(jarURLConnection != null){
+                            JarFile jarFile = jarURLConnection.getJarFile();
+                            if(jarFile != null){
+                                Enumeration<JarEntry> jarentries = jarFile.entries();
+                                while (jarentries.hasMoreElements()){
+                                    JarEntry jarEntry = jarentries.nextElement();
+                                    String jarEntryName = jarEntry.getName();
+                                    if(jarEntryName.endsWith(".class")){
+                                        String className = jarEntryName.substring(0,jarEntryName.lastIndexOf(".")).replaceAll("/",".");
+                                        doAddClass(classSet,className);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }catch (Exception e){
+            logger.error("get class set failure", e);
+            throw new RuntimeException(e);
+        }
+        return classSet;
+    }
+
+    private  static void addClass(Set<Class<?>> classSet,String packagePath,String packageName){
+
+    }
+
+    private static void doAddClass(Set<Class<?>> classSet,String calssName){
+        Class<?> cls = loadClass(calssName,false);
+        classSet.add(cls);
+    }
+}

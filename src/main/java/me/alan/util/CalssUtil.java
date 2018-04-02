@@ -1,8 +1,11 @@
 package me.alan.util;
 
+import com.alibaba.druid.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileFilter;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.Enumeration;
@@ -84,8 +87,32 @@ public class CalssUtil {
         return classSet;
     }
 
-    private  static void addClass(Set<Class<?>> classSet,String packagePath,String packageName){
-
+    private  static void addClass(Set<Class<?>> classSet, String packagePath, final String packageName){
+        File[] files = new File(packagePath).listFiles(new FileFilter() {
+            public boolean accept(File pathname) {
+                return (pathname.isFile() && pathname.getName().endsWith(".class")) || pathname.isDirectory();
+            }
+        });
+        for (File file : files){
+            String fileName = file.getName();
+            if(file.isFile()){
+                String className = fileName.substring(0,fileName.lastIndexOf("."));
+                if(!(StringUtils.isEmpty(packageName))){
+                    className = packageName + "." + className;
+                }
+                doAddClass(classSet,className);
+            }else {
+                String subPackagePath = fileName;
+                if(!(StringUtils.isEmpty(packagePath))){
+                    subPackagePath = packagePath + "/" +subPackagePath;
+                }
+                String subPackageName = fileName;
+                if (!(StringUtils.isEmpty(packageName))){
+                    subPackageName = packageName + "." +subPackageName;
+                }
+                addClass(classSet,subPackagePath,subPackageName);
+            }
+        }
     }
 
     private static void doAddClass(Set<Class<?>> classSet,String calssName){

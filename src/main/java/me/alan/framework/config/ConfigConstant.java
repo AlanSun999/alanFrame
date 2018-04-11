@@ -1,4 +1,4 @@
-package me.alan.config;
+package me.alan.framework.config;
 
 /**
  * @Description: 提供相关配置项常量

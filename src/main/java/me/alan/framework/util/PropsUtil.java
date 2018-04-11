@@ -1,9 +1,6 @@
-package me.alan.util;
-
-import com.alibaba.druid.util.StringUtils;
+package me.alan.framework.util;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 /**
@@ -25,6 +22,13 @@ public class PropsUtil {
     }
 
     public static String getString(Properties properties, String name){
-        return properties.getProperty(name);
+        return getString(properties,name,"");
+    }
+    public static String getString(Properties properties, String name, String defalut){
+        if ("".equals(defalut)){
+            return properties.getProperty(name);
+        }else {
+            return defalut;
+        }
     }
 }

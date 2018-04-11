@@ -1,4 +1,4 @@
-package me.alan.util;
+package me.alan.framework.util;
 
 import com.alibaba.druid.util.StringUtils;
 import org.slf4j.Logger;

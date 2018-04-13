@@ -9,7 +9,7 @@ import java.util.Properties;
  * @Date: 2018-04-02
  * @Time: 15:45
  */
-public class PropsUtil {
+public final class PropsUtil {
 
     public static Properties loadProps(String configFile){
         Properties properties = new Properties();

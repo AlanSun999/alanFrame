@@ -20,7 +20,7 @@ import java.util.jar.JarFile;
  * @Date: 2018-04-02
  * @Time: 15:47
  */
-public class CalssUtil {
+public final class CalssUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(CalssUtil.class);
 
